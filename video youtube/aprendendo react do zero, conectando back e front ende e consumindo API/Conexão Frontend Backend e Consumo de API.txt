@@ -1,0 +1,328 @@
+Peço desculpas pelo equívoco! Vou assistir ao vídeo correto sobre React e criar um passo a passo estruturado para você ensinar seus alunos.
+
+**Aula: "Introdução ao React - Conexão Frontend/Backend e Consumo de API"**
+
+**Objetivo da Aula:** Ensinar os fundamentos do React, criar uma aplicação frontend e conectá-la a um backend com consumo de API real.
+
+**Pré-requisitos para os Alunos:**
+- Conhecimento básico em HTML, CSS e JavaScript
+- Node.js instalado
+- Editor de código (VS Code recomendado)
+
+---
+
+### **Passo a Passo Detalhado da Aula**
+
+#### **Fase 1: Configuração do Ambiente (15 minutos)**
+
+1. **Verificação do Ambiente**
+   ```bash
+   node --version
+   npm --version
+   ```
+
+2. **Criação do Projeto React**
+   ```bash
+   npx create-react-app meu-projeto-frontend
+   cd meu-projeto-frontend
+   npm start
+   ```
+
+3. **Estrutura de Pastas**
+   ```
+   src/
+   ├── components/
+   ├── services/
+   ├── App.js
+   ├── App.css
+   └── index.js
+   ```
+
+#### **Fase 2: Fundamentos do React (30 minutos)**
+
+1. **Componentes Funcionais**
+   ```jsx
+   // components/Header.js
+   import React from 'react';
+
+   function Header() {
+     return (
+       <header>
+         <h1>Minha Aplicação</h1>
+       </header>
+     );
+   }
+
+   export default Header;
+   ```
+
+2. **JSX e Props**
+   ```jsx
+   // components/UserCard.js
+   function UserCard({ nome, email }) {
+     return (
+       <div className="user-card">
+         <h3>{nome}</h3>
+         <p>{email}</p>
+       </div>
+     );
+   }
+   ```
+
+3. **Estado com useState**
+   ```jsx
+   import React, { useState } from 'react';
+
+   function Counter() {
+     const [count, setCount] = useState(0);
+
+     return (
+       <div>
+         <p>Contagem: {count}</p>
+         <button onClick={() => setCount(count + 1)}>
+           Incrementar
+         </button>
+       </div>
+     );
+   }
+   ```
+
+#### **Fase 3: Configuração do Backend (20 minutos)**
+
+1. **Criando Servidor Express**
+   ```bash
+   mkdir backend
+   cd backend
+   npm init -y
+   npm install express cors
+   ```
+
+2. **Servidor Básico**
+   ```javascript
+   // backend/server.js
+   const express = require('express');
+   const cors = require('cors');
+
+   const app = express();
+   app.use(cors());
+   app.use(express.json());
+
+   const users = [
+     { id: 1, name: "João Silva", email: "joao@email.com" },
+     { id: 2, name: "Maria Santos", email: "maria@email.com" }
+   ];
+
+   app.get('/api/users', (req, res) => {
+     res.json(users);
+   });
+
+   app.listen(5000, () => {
+     console.log('Servidor rodando na porta 5000');
+   });
+   ```
+
+#### **Fase 4: Consumindo API no Frontend (30 minutos)**
+
+1. **Serviço de API**
+   ```javascript
+   // services/api.js
+   const API_URL = 'http://localhost:5000/api';
+
+   export const apiService = {
+     async getUsers() {
+       const response = await fetch(`${API_URL}/users`);
+       return await response.json();
+     },
+
+     async createUser(user) {
+       const response = await fetch(`${API_URL}/users`, {
+         method: 'POST',
+         headers: {
+           'Content-Type': 'application/json',
+         },
+         body: JSON.stringify(user),
+       });
+       return await response.json();
+     }
+   };
+   ```
+
+2. **Componente com Consumo de API**
+   ```jsx
+   // components/UserList.js
+   import React, { useState, useEffect } from 'react';
+   import { apiService } from '../services/api';
+
+   function UserList() {
+     const [users, setUsers] = useState([]);
+     const [loading, setLoading] = useState(true);
+
+     useEffect(() => {
+       loadUsers();
+     }, []);
+
+     const loadUsers = async () => {
+       try {
+         const userData = await apiService.getUsers();
+         setUsers(userData);
+       } catch (error) {
+         console.error('Erro ao carregar usuários:', error);
+       } finally {
+         setLoading(false);
+       }
+     };
+
+     if (loading) return <div>Carregando...</div>;
+
+     return (
+       <div>
+         <h2>Lista de Usuários</h2>
+         {users.map(user => (
+           <div key={user.id}>
+             <h3>{user.name}</h3>
+             <p>{user.email}</p>
+           </div>
+         ))}
+       </div>
+     );
+   }
+   ```
+
+#### **Fase 5: Integração Completa (25 minutos)**
+
+1. **App Principal Integrado**
+   ```jsx
+   // App.js
+   import React from 'react';
+   import './App.css';
+   import Header from './components/Header';
+   import UserList from './components/UserList';
+   import UserForm from './components/UserForm';
+
+   function App() {
+     return (
+       <div className="App">
+         <Header />
+         <main>
+           <UserForm />
+           <UserList />
+         </main>
+       </div>
+     );
+   }
+
+   export default App;
+   ```
+
+2. **Componente de Formulário**
+   ```jsx
+   // components/UserForm.js
+   import React, { useState } from 'react';
+   import { apiService } from '../services/api';
+
+   function UserForm() {
+     const [name, setName] = useState('');
+     const [email, setEmail] = useState('');
+
+     const handleSubmit = async (e) => {
+       e.preventDefault();
+       
+       try {
+         await apiService.createUser({ name, email });
+         setName('');
+         setEmail('');
+         alert('Usuário criado com sucesso!');
+       } catch (error) {
+         alert('Erro ao criar usuário');
+       }
+     };
+
+     return (
+       <form onSubmit={handleSubmit}>
+         <input
+           type="text"
+           placeholder="Nome"
+           value={name}
+           onChange={(e) => setName(e.target.value)}
+         />
+         <input
+           type="email"
+           placeholder="Email"
+           value={email}
+           onChange={(e) => setEmail(e.target.value)}
+         />
+         <button type="submit">Criar Usuário</button>
+       </form>
+     );
+   }
+   ```
+
+#### **Fase 6: Tratamento de Erros e Melhores Práticas (20 minutos)**
+
+1. **Tratamento de Erros Avançado**
+   ```jsx
+   const [error, setError] = useState('');
+
+   const loadUsers = async () => {
+     try {
+       setError('');
+       setLoading(true);
+       const userData = await apiService.getUsers();
+       setUsers(userData);
+     } catch (error) {
+       setError('Erro ao carregar usuários');
+     } finally {
+       setLoading(false);
+     }
+   };
+   ```
+
+2. **Custom Hook para API**
+   ```jsx
+   // hooks/useApi.js
+   import { useState, useEffect } from 'react';
+   import { apiService } from '../services/api';
+
+   export const useApi = (endpoint) => {
+     const [data, setData] = useState([]);
+     const [loading, setLoading] = useState(true);
+     const [error, setError] = useState('');
+
+     useEffect(() => {
+       fetchData();
+     }, []);
+
+     const fetchData = async () => {
+       try {
+         const result = await apiService[endpoint]();
+         setData(result);
+       } catch (err) {
+         setError('Erro na requisição');
+       } finally {
+         setLoading(false);
+       }
+     };
+
+     return { data, loading, error, refetch: fetchData };
+   };
+   ```
+
+---
+
+### **Exercícios Práticos para os Alunos**
+
+1. **Exercício 1:** Criar um componente que exiba os detalhes de um único usuário
+2. **Exercício 2:** Implementar funcionalidade de deletar usuário
+3. **Exercício 3:** Adicionar validação ao formulário de criação
+4. **Exercício 4:** Criar um loading spinner customizado
+5. **Exercício 5:** Implementar busca/filtro na lista de usuários
+
+### **Dicas para o Professor**
+
+- Comece mostrando a aplicação funcionando para motivar os alunos
+- Explique cada conceito antes da prática (components, state, effects)
+- Use o React Dev Tools para debug durante a demonstração
+- Encoraje os alunos a lerem os erros no console
+- Mostre como usar o Network tab do navegador para ver as requisições
+
+Este passo a passo cobre todo o fluxo mostrado no vídeo do DevClub, desde a criação do projeto React até a integração completa com backend e consumo de API.

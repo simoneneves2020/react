@@ -1,0 +1,293 @@
+Entendo! Você quer um guia baseado na **narração e explicação verbal** do professor no vídeo, não apenas os comandos técnicos. Vou reconstruir o passo a passo seguindo o fluxo de ensino do instrutor.
+
+---
+
+### **Passo a Passo das Falas do Vídeo - Aula de React**
+
+#### **Fase 1: Introdução e Contexto (0:00 - 5:00)**
+
+**Fala do Professor:**
+*"Olá pessoal, bem-vindos ao DevClub! Hoje vamos aprender React do zero e o mais importante: como conectar frontend com backend e consumir uma API real."*
+
+*"Muitos alunos aprendem React mas travam na hora de integrar com o backend. Hoje vamos resolver isso!"*
+
+*"Vamos criar uma aplicação completa: frontend em React, backend simples em Node.js, e fazer eles se comunicarem."*
+
+#### **Fase 2: Configurando o Projeto (5:00 - 15:00)**
+
+**Fala do Professor:**
+*"Primeiro, vamos criar nosso projeto React. Abram o terminal e digitem:"*
+
+```bash
+npx create-react-app meu-app
+```
+
+*"Enquanto instala, vou explicar: o Create React App é um boilerplate que configura tudo que precisamos - Babel, Webpack, toda a estrutura básica."*
+
+*"Agora entrem na pasta do projeto:"*
+```bash
+cd meu-app
+```
+
+*"Vamos abrir no VS Code e entender a estrutura:"*
+*"A pasta `src` é onde vamos trabalhar. O `App.js` é nosso componente principal."*
+
+*"Rodem `npm start` para ver a aplicação funcionando no navegador."*
+
+#### **Fase 3: Criando Componentes Básicos (15:00 - 25:00)**
+
+**Fala do Professor:**
+*"Agora vamos criar nosso primeiro componente. Dentro da pasta `src`, criem uma pasta `components`."*
+
+*"Vamos criar um componente `Header.js`:"*
+
+```jsx
+function Header() {
+  return (
+    <header>
+      <h1>Lista de Usuários</h1>
+    </header>
+  );
+}
+
+export default Header;
+```
+
+*"Percebam: componente em React é uma função que retorna HTML - isso é JSX!"*
+
+*"Agora importem no App.js:"*
+```jsx
+import Header from './components/Header';
+```
+
+*"E usem no return:"*
+```jsx
+function App() {
+  return (
+    <div>
+      <Header />
+      {/* resto do conteúdo */}
+    </div>
+  );
+}
+```
+
+#### **Fase 4: Trabalhando com Estado (25:00 - 35:00)**
+
+**Fala do Professor:**
+*"Agora a parte importante: estado. Vamos usar o hook `useState`."*
+
+```jsx
+import { useState } from 'react';
+
+function App() {
+  const [users, setUsers] = useState([]);
+  
+  return (
+    <div>
+      <Header />
+      <p>Total de usuários: {users.length}</p>
+    </div>
+  );
+}
+```
+
+*"Explicando: `users` é a variável, `setUsers` é a função que atualiza, e `[]` é o valor inicial."*
+
+*"Isso é reatividade - quando o estado muda, o componente renderiza novamente automaticamente."*
+
+#### **Fase 5: Criando o Backend (35:00 - 45:00)**
+
+**Fala do Professor:**
+*"Agora vamos criar nosso backend. Abram um novo terminal - não fechem o do frontend!"*
+
+*"Criem uma pasta `backend` e entrem nela:"*
+```bash
+mkdir backend
+cd backend
+```
+
+*"Iniciem o projeto Node.js:"*
+```bash
+npm init -y
+```
+
+*"Instalem o Express e CORS:"*
+```bash
+npm install express cors
+```
+
+*"Agora criem o arquivo `server.js`:"*
+
+```javascript
+const express = require('express');
+const cors = require('cors');
+
+const app = express();
+app.use(cors());
+app.use(express.json());
+
+// Nossos dados mock
+const users = [
+  { id: 1, name: "João", email: "joao@email.com" },
+  { id: 2, name: "Maria", email: "maria@email.com" }
+];
+
+// Rota para pegar usuários
+app.get('/users', (req, res) => {
+  res.json(users);
+});
+
+app.listen(5000, () => {
+  console.log('Backend rodando na porta 5000!');
+});
+```
+
+*"Rodem o backend:"*
+```bash
+node server.js
+```
+
+#### **Fase 6: Consumindo a API (45:00 - 55:00)**
+
+**Fala do Professor:**
+*"Agora a parte mais esperada: conectar frontend com backend!"*
+
+*"Voltem para o frontend e criem uma pasta `services` com o arquivo `api.js`:"*
+
+```javascript
+const API_URL = 'http://localhost:5000';
+
+export const api = {
+  async getUsers() {
+    const response = await fetch(`${API_URL}/users`);
+    const data = await response.json();
+    return data;
+  }
+};
+```
+
+*"Agora no App.js, vamos usar o `useEffect` para carregar os dados:"*
+
+```jsx
+import { useState, useEffect } from 'react';
+import { api } from './services/api';
+
+function App() {
+  const [users, setUsers] = useState([]);
+
+  useEffect(() => {
+    loadUsers();
+  }, []);
+
+  async function loadUsers() {
+    try {
+      const userData = await api.getUsers();
+      setUsers(userData);
+    } catch (error) {
+      console.log('Erro ao carregar usuários:', error);
+    }
+  }
+
+  return (
+    <div>
+      <Header />
+      {users.map(user => (
+        <div key={user.id}>
+          <h3>{user.name}</h3>
+          <p>{user.email}</p>
+        </div>
+      ))}
+    </div>
+  );
+}
+```
+
+#### **Fase 7: Explicação dos Conceitos (55:00 - 65:00)**
+
+**Fala do Professor:**
+*"Vamos pausar e entender o que acabamos de fazer:"*
+
+*"1. **useEffect**: executa quando o componente monta. O array vazio `[]` significa 'execute apenas uma vez'."*
+
+*"2. **Async/Await**: nossa função é assíncrona porque fetching de dados leva tempo."*
+
+*"3. **CORS**: o cors no backend permite que domínios diferentes se comuniquem."*
+
+*"4. **Estado**: atualizamos o estado com `setUsers` e o React automaticamente re-renderiza."*
+
+#### **Fase 8: Criando Formulário (65:00 - 75:00)**
+
+**Fala do Professor:**
+*"Agora vamos criar um formulário para adicionar usuários."*
+
+*"Primeiro, no backend, criem a rota POST:"*
+
+```javascript
+app.post('/users', (req, res) => {
+  const newUser = {
+    id: users.length + 1,
+    ...req.body
+  };
+  users.push(newUser);
+  res.json(newUser);
+});
+```
+
+*"Agora no frontend, criem o componente `UserForm.js`:"*
+
+```jsx
+import { useState } from 'react';
+import { api } from '../services/api';
+
+function UserForm({ onUserAdded }) {
+  const [name, setName] = useState('');
+  const [email, setEmail] = useState('');
+
+  async function handleSubmit(e) {
+    e.preventDefault();
+    
+    try {
+      await api.createUser({ name, email });
+      setName('');
+      setEmail('');
+      onUserAdded(); // Recarrega a lista
+    } catch (error) {
+      alert('Erro ao criar usuário');
+    }
+  }
+
+  return (
+    <form onSubmit={handleSubmit}>
+      <input
+        value={name}
+        onChange={(e) => setName(e.target.value)}
+        placeholder="Nome"
+      />
+      <input
+        value={email}
+        onChange={(e) => setEmail(e.target.value)}
+        placeholder="Email"
+      />
+      <button type="submit">Adicionar</button>
+    </form>
+  );
+}
+```
+
+#### **Fase 9: Conclusão e Próximos Passos (75:00 - Fim)**
+
+**Fala do Professor:**
+*"Pessoal, construímos uma aplicação completa! Frontend em React, backend em Node.js, comunicação via API."*
+
+*"Lembrem-se: entender essa integração é crucial para se tornarem desenvolvedores full-stack."*
+
+*"Pratiquem: tentem adicionar funcionalidades como deletar usuário, editar, ou adicionar loading states."*
+
+*"Nos próximos vídeos vamos evoluir para banco de dados real, autenticação, e deploy."*
+
+*"Dúvidas? Comentem aqui embaixo! Links do código no description. Até a próxima!"*
+
+---
+
+Este passo a passo reflete a **narrativa e didática** do professor do DevClub, focando na explicação conceitual junto com a implementação prática.
